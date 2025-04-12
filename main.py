@@ -27,6 +27,7 @@ def greet(message):
     markup.row(types.KeyboardButton("допомога"))
     markup.row(types.KeyboardButton("завчити"))
     markup.row(types.KeyboardButton("пройти тестування"))
+    markup.row(types.KeyboardButton("контекстне використання фразеологізмів"))
     bot.send_message(message.chat.id, "Привіт! Я твій помічник у вивченні фразеологізмів. Обери режим!",
                      reply_markup=markup)
 
@@ -114,21 +115,42 @@ def next_phrase(message):
 
 @bot.message_handler(func=lambda message: message.text == "наступний тест")
 def next_test(message):
-    global current_quiz
-    current_quiz = random.choice(quizzes)
+    global current_quiz_fill_in, current_quiz_regular
+    if current_quiz_fill_in:
+        current_quiz_fill_in = random.choice(fill_in_the_blank_phrases)
+        markup = types.ReplyKeyboardMarkup()
+        markup.row(types.KeyboardButton("наступний тест"))
+        markup.row(types.KeyboardButton("назад"))
+        bot.send_poll(chat_id=message.chat.id, type="quiz", question=current_quiz_fill_in["question"],
+                      options=current_quiz_fill_in["options"],
+                      correct_option_id=current_quiz_fill_in["correct_option_id"])
+    elif current_quiz_regular:
+        current_quiz_regular = random.choice(quizzes)
+        markup = types.ReplyKeyboardMarkup()
+        markup.row(types.KeyboardButton("наступний тест"))
+        markup.row(types.KeyboardButton("назад"))
+        bot.send_poll(chat_id=message.chat.id, type="quiz", question=current_quiz_regular["question"],
+                      options=current_quiz_regular["options"],
+                      correct_option_id=current_quiz_regular["correct_option_id"])
+
+
+from fill_in_the_blank import fill_in_the_blank_phrases
+@bot.message_handler(func=lambda message: message.text == "контекстне використання фразеологізмів")
+def send_fill_in_the_blank(message):
+    global current_quiz_fill_in
+    current_quiz_fill_in = random.choice(fill_in_the_blank_phrases)
     markup = types.ReplyKeyboardMarkup()
     markup.row(types.KeyboardButton("наступний тест"))
     markup.row(types.KeyboardButton("назад"))
-    bot.send_poll(chat_id=message.chat.id, type="quiz", question=current_quiz["question"],
-                  options=current_quiz["options"], correct_option_id=current_quiz["correct_option_id"])
-
-
+    bot.send_poll(reply_markup=markup, chat_id=message.chat.id, type="quiz", question=current_quiz_fill_in["question"],
+                  options=current_quiz_fill_in["options"], correct_option_id=current_quiz_fill_in["correct_option_id"])
 @bot.message_handler(func=lambda message: message.text == "назад")
 def back_to_menu(message):
     markup = types.ReplyKeyboardMarkup()
     markup.row(types.KeyboardButton("допомога"))
     markup.row(types.KeyboardButton("завчити"))
     markup.row(types.KeyboardButton("пройти тестування"))
+    markup.row(types.KeyboardButton("контекстне використання фразеологізмів"))
     bot.send_message(message.chat.id, "Обери режим!", reply_markup=markup)
 
 bot.polling()
