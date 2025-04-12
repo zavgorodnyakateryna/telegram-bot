@@ -136,7 +136,7 @@ def send_fill_in_the_blank(message):
     markup.row(types.KeyboardButton("назад"))
 
     bot.send_poll(chat_id=message.chat.id, type="quiz", question=current_sentence["phrase"],
-                  options=current_sentence["variants"], correct_option_id=current_sentence["current_option_id"],
+                  options=current_sentence["variants"], correct_option_id=current_sentence["correct_option_id"],
                   reply_markup=markup)
 
 @bot.message_handler(func=lambda message: message.text == "наступне речення")
@@ -147,7 +147,7 @@ def next_test(message):
     markup.row(types.KeyboardButton("наступнe речення"))
     markup.row(types.KeyboardButton("назад"))
     bot.send_poll(chat_id=message.chat.id, type="quiz", question=current_sentence["phrase"],
-                  options=current_sentence["variants"], correct_option_id=current_sentence["current_option_id"])
+                  options=current_sentence["variants"], correct_option_id=current_sentence["correct_option_id"])
 @bot.message_handler(func=lambda message: message.text == "назад")
 def back_to_menu(message):
     markup = types.ReplyKeyboardMarkup()
